@@ -167,7 +167,7 @@ class ContractController:
                 marked_html, clauses = ContractProcessor.mark_clauses(html_content)
 
                 # Extract key properties
-                properties = await ContractProcessor.extract_key_properties(clauses)
+                properties = await ContractProcessor.extract_key_properties(html_content)
 
                 # Save ContractReview to the database
                 contract_review = ContractReview(
