@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useQuery } from 'react-query';
 import { paths } from '@/routes/paths';
 import Column from '@/components/core/column';
@@ -6,16 +7,22 @@ import Scrollbar from '@/components/scrollbar';
 import { useSearchParams } from '@/routes/hooks';
 import { TableHeadCustom } from '@/components/table';
 import { snakeCaseToTitleCase } from '@/utils/format';
+import { ContractReview } from '@/services/types/contract';
 import { LoadingTopbar } from '@/components/loading-screen';
 import CustomBreadcrumbs from '@/components/custom-breadcrumbs';
 
 import {
+  Box,
   Card,
   Table,
+  Button,
+  Dialog,
   TableRow,
   TableBody,
   TableCell,
   Typography,
+  DialogActions,
+  DialogContent,
   TableContainer,
 } from '@mui/material';
 
@@ -25,6 +32,8 @@ const ContractCompareView = () => {
   const searchParams = useSearchParams();
 
   const ids = searchParams.get('ids')?.split(',') || [];
+
+  const [selectedFile, setSelectedFile] = useState<ContractReview | null>(null);
 
   // ------------ QUERY -------------
 
@@ -108,7 +117,16 @@ const ContractCompareView = () => {
   const renderTableBody = (
     <TableBody>
       {contractQuery?.data?.data?.map((contract) => (
-        <TableRow key={contract._id}>
+        <TableRow
+          key={contract._id}
+          hover
+          onClick={() => {
+            setSelectedFile(contract);
+          }}
+          sx={{
+            cursor: 'pointer',
+          }}
+        >
           <TableCell>{contract.file_name}</TableCell>
           <TableCell>{contract.contract_type}</TableCell>
           <TableCell>{contract.pages}</TableCell>
@@ -129,7 +147,7 @@ const ContractCompareView = () => {
       <Card variant="outlined">
         <TableContainer sx={{ overflow: 'unset' }}>
           <Scrollbar>
-            <Table sx={{}}>
+            <Table>
               <TableHeadCustom headLabel={listOfLabelsForFiles} />
               {contractQuery.isLoading
                 ? renderLoadingTableBody
@@ -142,6 +160,34 @@ const ContractCompareView = () => {
           </Scrollbar>
         </TableContainer>
       </Card>
+
+      <Dialog
+        open={!!selectedFile}
+        onClose={() => {
+          setSelectedFile(null);
+        }}
+        fullWidth
+        maxWidth={'xl'}
+      >
+        <DialogContent sx={{ margin: 0.25 }}>
+          <Box
+            dangerouslySetInnerHTML={{ __html: selectedFile?.marked_html || '' }}
+            sx={{
+              padding: 2,
+            }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setSelectedFile(null);
+            }}
+            color="primary"
+          >
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Column>
   );
 };
