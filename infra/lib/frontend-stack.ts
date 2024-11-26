@@ -61,7 +61,7 @@ export class FrontendStack extends cdk.Stack {
 
     // Deploy the website content to the S3 bucket
     new s3deploy.BucketDeployment(this, 'DeployWebsite', {
-      sources: [s3deploy.Source.asset('../out')],
+      sources: [s3deploy.Source.asset('../frontend/out')],
       destinationBucket: bucket,
       distribution,
       distributionPaths: ['/*'],

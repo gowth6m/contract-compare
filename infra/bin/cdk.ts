@@ -21,26 +21,28 @@ const region = process.env.AWS_REGION || defaultRegion;
 const stage = process.env.ENVIRONMENT || defaultEnvironment;
 const regionForFrontend = 'us-east-1';
 
-const stackName = `BackendStack-${stage}`;
-
 // --------------------------------------------------------------
 
 const app = new cdk.App();
-new BackendStack(app, stackName, {
+
+new BackendStack(app, `BackendStack-${stage}`, {
   env: {
     account: accountID,
     region: region,
   },
   stage: stage,
-  stackName: stackName,
+  stackName: `BackendStack-${stage}`,
   description: `Backend stack for ${stage} stage`,
 });
-new FrontendStack(app, 'FrontendStack', {
+
+new FrontendStack(app, `FrontendStack-${stage}`, {
   env: {
     account: accountID,
     region: regionForFrontend,
   },
   stage: stage,
-  stackName: 'FrontendStack',
+  stackName: `FrontendStack-${stage}`,
   description: `Frontend stack for ${stage} stage`,
 });
+
+app.synth();
