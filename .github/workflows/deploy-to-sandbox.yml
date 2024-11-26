@@ -54,7 +54,13 @@ jobs:
               working-directory: infra
               run: npm install
 
-            - name: Deploy CDK Stack
+            - name: Deploy Backend Stack
               working-directory: infra
               run: |
-                  cdk deploy BackendStack-${{ env.ENVIRONMENT }} FrontendStack-${{ env.ENVIRONMENT }} --require-approval never
+                  cdk deploy BackendStack-${{ env.ENVIRONMENT }} --require-approval never
+
+            - name: Deploy Frontend Stack
+              working-directory: infra
+              run: |
+                  cdk deploy FrontendStack-${{ env.ENVIRONMENT }} --require-approval never
+            
