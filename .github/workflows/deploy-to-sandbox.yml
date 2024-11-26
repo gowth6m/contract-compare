@@ -1,4 +1,4 @@
-name: CDK Deployment to Production
+name: CDK Deployment to Sandbox
 
 on:
   release:
@@ -22,7 +22,7 @@ jobs:
                   echo "AWS_ACCOUNT_ID=${{ vars.AWS_ACCOUNT_ID }}" >> $GITHUB_ENV
                   echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
                   echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
-                  echo "ENVIRONMENT=prod" >> $GITHUB_ENV
+                  echo "ENVIRONMENT=sandbox" >> $GITHUB_ENV
                   echo "RELEASE_VERSION=${{ github.sha }}" >> $GITHUB_ENV
 
             - name: Build Lambda Files
