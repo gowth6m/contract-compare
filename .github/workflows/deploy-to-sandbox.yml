@@ -1,11 +1,11 @@
 name: CDK Deployment to Sandbox
 
 on:
-  release:
-    types: [created]
+    release:
+        types: [created]
 
 jobs:
-    build-and-deploy:
+    build-and-deploy-backend:
         runs-on: ubuntu-latest
         steps:
             - name: Check out the repository
@@ -29,18 +29,6 @@ jobs:
               working-directory: backend
               run: make buildForLambda
 
-            - name: Install frontend dependencies
-              working-directory: frontend
-              run: npm ci
-
-            - name: Build frontend
-              working-directory: frontend
-              run: npm run build
-
-            - name: Set up API endpoints
-              working-directory: frontend
-              run: cp ./src/configs/sandbox/app-config.ts ./src/configs/app-config.ts
-
             - name: Set up Node.js
               uses: actions/setup-node@v3
               with:
@@ -54,7 +42,52 @@ jobs:
               working-directory: infra
               run: npm install
 
-            - name: Deploy CDK Stack
+            - name: Deploy Backend Stack
               working-directory: infra
               run: |
-                  cdk deploy BackendStack-${{ env.ENVIRONMENT }} FrontendStack-${{ env.ENVIRONMENT }} --require-approval never
+                  cdk deploy BackendStack-${{ env.ENVIRONMENT }} --require-approval never
+
+    build-and-deploy-frontend:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Check out the repository
+              uses: actions/checkout@v4
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v3
+              with:
+                  node-version: "22"
+
+            - name: Set up Environment Variables
+              run: |
+                  echo "AWS_REGION=eu-west-2" >> $GITHUB_ENV
+                  echo "AWS_ACCOUNT_ID=${{ vars.AWS_ACCOUNT_ID }}" >> $GITHUB_ENV
+                  echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
+                  echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
+                  echo "ENVIRONMENT=sandbox" >> $GITHUB_ENV
+                  echo "RELEASE_VERSION=${{ github.sha }}" >> $GITHUB_ENV
+
+            - name: Install frontend dependencies
+              working-directory: frontend
+              run: npm ci
+
+            - name: Build frontend
+              working-directory: frontend
+              run: npm run build
+
+            - name: Set up API endpoints
+              working-directory: frontend
+              run: cp ./src/configs/sandbox/app-config.ts ./src/configs/app-config.ts
+
+            - name: Install AWS CDK
+              working-directory: infra
+              run: npm install -g aws-cdk
+
+            - name: Install CDK Dependencies
+              working-directory: infra
+              run: npm install
+
+            - name: Deploy Frontend Stack
+              working-directory: infra
+              run: |
+                  cdk deploy FrontendStack-${{ env.ENVIRONMENT }} --require-approval never
