@@ -130,6 +130,11 @@ class ContractController:
 
     async def process_uploaded_files(self, event: dict):
         print(f"Received event: {event}")
+
+        print(f"Processing {len(event['Records'])} records...")
+
+        print("OPEN AI")
+
         for record in event["Records"]:
             file_id = None
             user_id = None
@@ -162,7 +167,7 @@ class ContractController:
                 marked_html, clauses = ContractProcessor.mark_clauses(html_content)
 
                 # Extract key properties
-                properties = ContractProcessor.extract_key_properties(clauses)
+                properties = await ContractProcessor.extract_key_properties(clauses)
 
                 # Save ContractReview to the database
                 contract_review = ContractReview(
@@ -351,3 +356,16 @@ class ContractController:
         if not batch:
             raise HTTPException(status_code=404, detail="Batch not found.")
         return batch
+
+    async def test_extract_properties(self, current_user: User, review_id: str):
+        """
+        Test extracting key properties from a contract.
+        """
+        review = await self.contract_repo.get_review_by_id(
+            user_id=current_user.id, review_id=review_id
+        )
+        if not review:
+            raise NotFoundException(detail="Review not found.")
+
+        properties = await ContractProcessor.extract_key_properties(review.marked_html)
+        return properties

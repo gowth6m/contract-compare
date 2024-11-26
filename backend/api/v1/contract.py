@@ -172,3 +172,24 @@ async def get_batch_by_id(
         return response
     except Exception as e:
         raise InternalServerErrorException(str(e))
+
+
+@contract_router.get(
+    "/test/extract-key-properties/{review_id}",
+    dependencies=[Depends(AuthenticationRequired)],
+)
+async def test_extract_key_properties(
+    review_id: str = Path(..., title="The ID of review"),
+    current_user: User = Depends(get_current_user),
+    contract_controller: ContractController = Depends(
+        Container.get_contract_controller
+    ),
+):
+    try:
+        response = await contract_controller.test_extract_properties(
+            current_user=current_user,
+            review_id=review_id,
+        )
+        return response
+    except Exception as e:
+        raise InternalServerErrorException(str(e))
