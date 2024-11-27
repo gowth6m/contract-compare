@@ -35,8 +35,8 @@ const LoginView = () => {
 
   const formik = useFormik({
     initialValues: {
-      email: '',
-      password: '',
+      email: 'test@user.com',
+      password: '12345678',
     },
     onSubmit: async () => {
       await loginMutation.mutateAsync(formik.values);
