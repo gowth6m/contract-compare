@@ -2,6 +2,8 @@
 
 Live demo [here](https://app.sandbox.jurisai.uk)
 
+Video demo [here](https://youtu.be/WwDlyC-LlmM)
+
 ## Frontend
 
 The frontend is React application built with Vite, MUI, React Query and Axios.
