@@ -1,5 +1,6 @@
 import Row from '@/components/core/row';
 import { useRouter } from '@/routes/hooks';
+import Iconify from '@/components/iconify';
 import { Upload } from '@/components/upload';
 import Column from '@/components/core/column';
 import ApiClient from '@/services/api-client';
@@ -8,7 +9,18 @@ import { useQuery, useMutation } from 'react-query';
 import { useSnackbar } from '@/components/snackbar';
 import { LoadingTopbar } from '@/components/loading-screen';
 
-import { Alert, Stack, Button, Typography } from '@mui/material';
+import {
+  Alert,
+  Stack,
+  Button,
+  Dialog,
+  Typography,
+  IconButton,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  DialogContentText,
+} from '@mui/material';
 
 import FileRecentItem from '../components/file-recent-item';
 
@@ -88,11 +100,8 @@ const DashboardIndexView = () => {
           })
         ),
       ]);
-      if (acceptedFiles.length) {
-        uploadFileMutation.mutate(acceptedFiles);
-      }
     },
-    [files, uploadFileMutation]
+    [files]
   );
 
   const handleRemoveFile = (inputFile: File | string) => {
@@ -169,6 +178,62 @@ const DashboardIndexView = () => {
           ))}
         </Stack>
       )}
+
+      <Dialog
+        open={!!files.length}
+        onClose={() => {
+          setFiles([]);
+        }}
+      >
+        <DialogContent>
+          <DialogTitle>Sent these files to be processed?</DialogTitle>
+          <DialogContentText>
+            <Alert severity="info">
+              Once processed they will appear in recent files or check all files to access all your
+              processed files.
+            </Alert>
+            <Stack spacing={2} mt={2}>
+              {files.map((file, index) => (
+                <Row key={index} alignItems={'center'}>
+                  <Iconify icon="mdi:file-pdf" />
+                  <Typography key={index}>{file.name}</Typography>
+                  <IconButton
+                    size="small"
+                    onClick={() => {
+                      handleRemoveFile(file);
+                    }}
+                    sx={{
+                      marginLeft: 'auto',
+                    }}
+                  >
+                    <Iconify icon="mdi:close" />
+                  </IconButton>
+                </Row>
+              ))}
+            </Stack>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="outlined"
+            onClick={() => {
+              setFiles([]);
+            }}
+            disabled={uploadFileMutation.isLoading}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            onClick={() => {
+              uploadFileMutation.mutate(files);
+            }}
+            disabled={uploadFileMutation.isLoading}
+          >
+            Send
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Column>
   );
 };
