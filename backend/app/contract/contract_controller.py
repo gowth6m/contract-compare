@@ -167,7 +167,9 @@ class ContractController:
                 marked_html, clauses = ContractProcessor.mark_clauses(html_content)
 
                 # Extract key properties
-                properties = await ContractProcessor.extract_key_properties(html_content)
+                properties = await ContractProcessor.extract_key_properties(
+                    html_content
+                )
 
                 # Save ContractReview to the database
                 contract_review = ContractReview(
@@ -364,7 +366,8 @@ class ContractController:
         review = await self.contract_repo.get_review_by_id(
             user_id=current_user.id, review_id=review_id
         )
-        if not review:
+        if review is None:
+            print("Review not found.")
             raise NotFoundException(detail="Review not found.")
 
         properties = await ContractProcessor.extract_key_properties(review.marked_html)
